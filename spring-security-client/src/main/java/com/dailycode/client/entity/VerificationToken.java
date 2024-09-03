@@ -9,7 +9,6 @@ import java.util.Date;
 
 @Data
 @Entity
-@NoArgsConstructor
 public class VerificationToken {
 
     private static final int EXPIRATION_TIME = 10;
@@ -30,20 +29,25 @@ public class VerificationToken {
         super();
         this.token = token;
         this.user = user;
-        this.expirationTime = calculateExpirationDate(EXPIRATION_TIME);
+        this.expirationTime = calculateExpirationDate();
     }
 
     public VerificationToken(String token) {
         super();
         this.token = token;
-        this.expirationTime = calculateExpirationDate(EXPIRATION_TIME);
+        this.expirationTime = calculateExpirationDate();
 
     }
 
-    private Date calculateExpirationDate(int expirationTime) {
+    public VerificationToken() {
+        super();
+        this.expirationTime = calculateExpirationDate();
+    }
+
+    public Date calculateExpirationDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(new Date().getTime());
-        calendar.add(Calendar.MINUTE, expirationTime);
+        calendar.add(Calendar.MINUTE, VerificationToken.EXPIRATION_TIME);
         return new Date(calendar.getTime().getTime());
     }
 }

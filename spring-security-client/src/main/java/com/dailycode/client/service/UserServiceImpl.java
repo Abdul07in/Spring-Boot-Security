@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -50,18 +52,25 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = verificationToken.getUser();
-
         Calendar calendar = Calendar.getInstance();
 
         if ((verificationToken.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0) {
-            tokenRepository.delete(verificationToken);
+//            tokenRepository.delete(verificationToken);
             return "Token Expired";
         }
 
         user.setEnable(true);
-
         userRepository.save(user);
 
         return "valid";
+    }
+
+    @Override
+    public VerificationToken generateNewVerificationToken(String oldToken) {
+        VerificationToken verificationToken = tokenRepository.findByToken(oldToken);
+        verificationToken.setToken(UUID.randomUUID().toString());
+        verificationToken.setExpirationTime(verificationToken.calculateExpirationDate());
+        tokenRepository.save(verificationToken);
+        return verificationToken;
     }
 }
